@@ -36,9 +36,9 @@ class JSONStorage(BaseStorage):
         for existing_vacancy in vacancies_data:
             if (existing_vacancy['title'] == vacancy_dict['title'] and
                     existing_vacancy['employer'] == vacancy_dict['employer'] and
-                existing_vacancy['url'] == vacancy_dict['url']):
+                    existing_vacancy['url'] == vacancy_dict['url']):
                 return True
-            return False
+        return False  # ← ИСПРАВЛЕНИЕ: возвращаем False после проверки ВСЕХ вакансий
 
     def add_vacancy(self, vacancy: Vacancy) -> None:
         """Добавление вакансии в JSON-файл"""

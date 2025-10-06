@@ -1,4 +1,6 @@
-from typing import Optional, Any
+from __future__ import annotations
+from typing import Dict, Any, Optional
+
 
 class Vacancy:
     """Класс для представления вакансии"""
@@ -18,26 +20,10 @@ class Vacancy:
         self._requirements = requirements
         self._employer = employer
 
-    def __str__(self) -> str:
-        salary_info = "Зарплата не указана"
-        if self._salary_from or self._salary_to:
-            salary_parts = []
-            if self._salary_from:
-                salary_parts.append(f'от {self._salary_from}')
-            if self._salary_to:
-                salary_parts.append(f'до {self._salary_to}')
-            salary_info = f"{' '.join(salary_parts)} {self._currency}"
-        return (f"Вакансия: {self._title}\n"
-                f"Компания: {self._employer}\n"
-                f"Зарплата: {salary_info}\n"
-                f"Ссылка: {self._url}\n")
-
     def _validate_title(self, title: str) -> str:
         """Валидация названия вакансии"""
-
         if not title or not isinstance(title, str):
             raise ValueError("Название вакансии должно быть непустой строкой")
-
         return title.strip()
 
     def _validate_url(self, url: str) -> str:
@@ -96,22 +82,48 @@ class Vacancy:
             return self._salary_to
         return 0.0
 
+    # Методы сравнения по зарплате
     def __eq__(self, other: Vacancy) -> bool:
+        if not isinstance(other, Vacancy):
+            return NotImplemented
         return self.get_avg_salary() == other.get_avg_salary()
 
     def __lt__(self, other: Vacancy) -> bool:
+        if not isinstance(other, Vacancy):
+            return NotImplemented
         return self.get_avg_salary() < other.get_avg_salary()
 
     def __le__(self, other: Vacancy) -> bool:
+        if not isinstance(other, Vacancy):
+            return NotImplemented
         return self.get_avg_salary() <= other.get_avg_salary()
 
     def __gt__(self, other: Vacancy) -> bool:
+        if not isinstance(other, Vacancy):
+            return NotImplemented
         return self.get_avg_salary() > other.get_avg_salary()
 
     def __ge__(self, other: Vacancy) -> bool:
+        if not isinstance(other, Vacancy):
+            return NotImplemented
         return self.get_avg_salary() >= other.get_avg_salary()
 
-    def to_dict(self) -> dict[str, Any]:
+    def __str__(self) -> str:
+        salary_info = "Зарплата не указана"
+        if self._salary_from or self._salary_to:
+            salary_parts = []
+            if self._salary_from:
+                salary_parts.append(f"от {self._salary_from}")
+            if self._salary_to:
+                salary_parts.append(f"до {self._salary_to}")
+            salary_info = f"{' '.join(salary_parts)} {self._currency}"
+
+        return (f"Вакансия: {self._title}\n"
+                f"Компания: {self._employer}\n"
+                f"Зарплата: {salary_info}\n"
+                f"Ссылка: {self._url}\n")
+
+    def to_dict(self) -> Dict[str, Any]:
         """Преобразование вакансии в словарь"""
         return {
             'title': self._title,
@@ -125,7 +137,7 @@ class Vacancy:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> Vacancy:
+    def from_dict(cls, data: Dict[str, Any]) -> Vacancy:
         """Создание вакансии из словаря"""
         return cls(
             title=data.get('title', ''),
@@ -139,11 +151,12 @@ class Vacancy:
         )
 
     @staticmethod
-    def cast_to_object_list(vacancies_data: list[dict[str, Any]]) -> list[Vacancy]:
+    def cast_to_object_list(vacancies_data: list[Dict[str, Any]]) -> list[Vacancy]:
         """Преобразование списка словарей в список объектов Vacancy"""
         vacancies = []
         for vacancy_data in vacancies_data:
             try:
+                # Парсинг данных из API HH.ru
                 salary_data = vacancy_data.get('salary')
                 salary_from = salary_data.get('from') if salary_data else None
                 salary_to = salary_data.get('to') if salary_data else None
@@ -163,4 +176,5 @@ class Vacancy:
             except (ValueError, KeyError) as e:
                 print(f"Ошибка при создании вакансии: {e}")
                 continue
-            return vacancies
+
+        return vacancies
