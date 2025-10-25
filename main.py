@@ -9,7 +9,7 @@ def user_interaction():
     print("=" * 50)
 
     hh_api = HeadHunterAPI()
-    storage = JSONStorage
+    storage = JSONStorage()
 
     search_query = input("Введите поисковый запрос (например: Python разработчик): ").strip()
 
